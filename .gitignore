@@ -1,0 +1,14 @@
+# Build outputs
+build/
+*.o
+*.obj
+*.exe
+*.exegcc
+
+# Visual Studio Code local settings
+.vscode/
+
+# Common temporary files
+*.tmp
+*.log
+

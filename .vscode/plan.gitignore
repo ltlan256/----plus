@@ -1,7 +1,0 @@
-# 编译结果
-build/
-*.exe
-*.exegcc
-
-# VS Code 本地设置
-.vscode/
