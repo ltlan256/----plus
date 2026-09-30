@@ -6,9 +6,10 @@ build/
 *.exegcc
 
 # Visual Studio Code local settings
-.vscode/
+.vscode/*
+!.vscode/tasks.json
+!.vscode/launch.json
 
 # Common temporary files
 *.tmp
 *.log
-

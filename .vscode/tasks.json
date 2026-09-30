@@ -1,0 +1,40 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "编译图书馆程序",
+      "type": "shell",
+      "command": "C:/Users/ZXzh2/AppData/Local/Microsoft/WinGet/Packages/BrechtSanders.WinLibs.POSIX.UCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/mingw64/bin/gcc.exe",
+      "args": [
+        "-std=c11",
+        "-g",
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic",
+        "-Wshadow",
+        "-Wformat=2",
+        "${workspaceFolder}/main.c",
+        "${workspaceFolder}/book.c",
+        "${workspaceFolder}/user.c",
+        "${workspaceFolder}/loan.c",
+        "${workspaceFolder}/utils.c",
+        "-o",
+        "${workspaceFolder}/library.exe",
+        "-lwinmm"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": ["$gcc"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      }
+    }
+  ]
+}
