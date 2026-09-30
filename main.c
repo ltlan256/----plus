@@ -11,6 +11,7 @@
 #define BOOK_FILE "books.txt"
 #define USER_FILE "users.txt"
 #define LOAN_FILE "loans.txt"
+#define ENDING_ART_FILE "ending.txt"
 
 #ifdef _WIN32
 static int bgm_is_middle = -1;
@@ -121,10 +122,29 @@ static void strategy_info(void) {
     pause_page();
 }
 
+static void ending_page(void) {
+    char line[1024];
+    FILE *file = fopen(ENDING_ART_FILE, "r");
+
+    printf("\n========== 攻略成功 ==========" "\n\n");
+    if (file != NULL) {
+        while (fgets(line, sizeof(line), file) != NULL) fputs(line, stdout);
+        fclose(file);
+    } else {
+        printf("[无法读取最终攻略画面：%s]\n", ENDING_ART_FILE);
+    }
+    printf("\n恭喜你，可以跟流川枫一起打球了！\n");
+}
+
 static void relationship_status(const User *user) {
     int filled = user->returned_books * 10 / 25;
     if (filled > 10) filled = 10;
     bgm_update_for_progress(user->returned_books);
+    if (user->returned_books >= 25) {
+        ending_page();
+        pause_page();
+        return;
+    }
     printf("\n========== 攻略进度 ==========\n");
     printf("对象：流川枫  (´• ω •`)\n");
     flow_portrait(user->returned_books > 4);
@@ -136,9 +156,7 @@ static void relationship_status(const User *user) {
     printf("流川枫  (´• ω •`)   好感度：");
     for (int i = 0; i < 10; i++) printf(i < filled ? "♥" : "♡");
     printf(" %d / 25 本\n", user->returned_books);
-    if (user->returned_books >= 25) {
-        printf("(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧ 攻略成功！流川枫已经记住你了！\n");
-    } else if (user->returned_books > 0) {
+    if (user->returned_books > 0) {
         printf("(ง •̀_•́)ง 继续借阅并归还，就快成功啦！\n");
     } else {
         printf("(｡•́︿•̀｡) 还没有成功归还记录，快去挑一本书吧！\n");
@@ -170,10 +188,16 @@ static void run_user(User *user, BookStore *books, UserStore *users, LoanStore *
         switch (choice) {
             case 1: book_list(books); break; case 2: book_search(books); break;
             case 3: loan_borrow(books, loans, user, BOOK_FILE, LOAN_FILE); break;
-            case 4:
+            case 4: {
+                int returned_before = user->returned_books;
                 loan_return(books, loans, users, user, BOOK_FILE, LOAN_FILE, USER_FILE);
                 bgm_update_for_progress(user->returned_books);
+                if (returned_before < 25 && user->returned_books >= 25) {
+                    ending_page();
+                    pause_page();
+                }
                 break;
+            }
             case 5: loan_list_for_user(loans, books, user); break; case 6: relationship_status(user); break;
             case 0: bgm_update_for_progress(0); return;
             default: printf("无效选项，请重新选择。\n");
