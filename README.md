@@ -30,7 +30,7 @@ gcc -std=c11 -Wall -Wextra -Wpedantic -Wshadow -Wformat=2 main.c book.c user.c l
 Windows PowerShell 下运行：
 
 ```powershell
-gcc -std=c11 -Wall -Wextra -Wpedantic -Wshadow -Wformat=2 main.c book.c user.c loan.c utils.c -o library.exe
+gcc -std=c11 -Wall -Wextra -Wpedantic -Wshadow -Wformat=2 main.c book.c user.c loan.c utils.c -o library.exe -lwinmm
 chcp 65001
 .\library.exe
 ```

@@ -13,17 +13,40 @@
 #define LOAN_FILE "loans.txt"
 
 #ifdef _WIN32
-static void bgm_start(void) {
-    mciSendStringA("open \"bgm.mp3\" type mpegvideo alias library_bgm", NULL, 0, NULL);
+static int bgm_is_middle = -1;
+
+static void bgm_play_stage(int use_middle) {
+    char command[128];
+    const char *filename;
+
+    if (bgm_is_middle == use_middle) return;
+
+    mciSendStringA("stop library_bgm", NULL, 0, NULL);
+    mciSendStringA("close library_bgm", NULL, 0, NULL);
+    filename = use_middle ? "middle.mp3" : "begin.mp3";
+    snprintf(command, sizeof(command),
+             "open \"%s\" type mpegvideo alias library_bgm", filename);
+    mciSendStringA(command, NULL, 0, NULL);
     mciSendStringA("play library_bgm repeat", NULL, 0, NULL);
+    bgm_is_middle = use_middle;
+}
+
+static void bgm_start(void) {
+    bgm_play_stage(0);
+}
+
+static void bgm_update_for_progress(int returned_books) {
+    bgm_play_stage(returned_books > 4);
 }
 
 static void bgm_stop(void) {
     mciSendStringA("stop library_bgm", NULL, 0, NULL);
     mciSendStringA("close library_bgm", NULL, 0, NULL);
+    bgm_is_middle = -1;
 }
 #else
 static void bgm_start(void) { }
+static void bgm_update_for_progress(int returned_books) { (void)returned_books; }
 static void bgm_stop(void) { }
 #endif
 
@@ -101,6 +124,7 @@ static void strategy_info(void) {
 static void relationship_status(const User *user) {
     int filled = user->returned_books * 10 / 25;
     if (filled > 10) filled = 10;
+    bgm_update_for_progress(user->returned_books);
     printf("\n========== 攻略进度 ==========\n");
     printf("对象：流川枫  (´• ω •`)\n");
     flow_portrait(user->returned_books > 4);
@@ -140,12 +164,18 @@ static void run_admin(BookStore *books, UserStore *users, LoanStore *loans) {
 
 static void run_user(User *user, BookStore *books, UserStore *users, LoanStore *loans) {
     int choice;
+    bgm_update_for_progress(user->returned_books);
     while (1) {
         user_menu(); choice = read_int("请选择操作: ");
         switch (choice) {
             case 1: book_list(books); break; case 2: book_search(books); break;
-            case 3: loan_borrow(books, loans, user, BOOK_FILE, LOAN_FILE); break; case 4: loan_return(books, loans, users, user, BOOK_FILE, LOAN_FILE, USER_FILE); break;
-            case 5: loan_list_for_user(loans, books, user); break; case 6: relationship_status(user); break; case 0: return;
+            case 3: loan_borrow(books, loans, user, BOOK_FILE, LOAN_FILE); break;
+            case 4:
+                loan_return(books, loans, users, user, BOOK_FILE, LOAN_FILE, USER_FILE);
+                bgm_update_for_progress(user->returned_books);
+                break;
+            case 5: loan_list_for_user(loans, books, user); break; case 6: relationship_status(user); break;
+            case 0: bgm_update_for_progress(0); return;
             default: printf("无效选项，请重新选择。\n");
         }
     }
