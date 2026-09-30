@@ -14,36 +14,41 @@
 #define ENDING_ART_FILE "ending.txt"
 
 #ifdef _WIN32
-static int bgm_is_middle = -1;
+enum { BGM_BEGIN, BGM_MIDDLE, BGM_ENDING };
+static int current_bgm_stage = -1;
 
-static void bgm_play_stage(int use_middle) {
+static void bgm_play_stage(int stage) {
     char command[128];
     const char *filename;
 
-    if (bgm_is_middle == use_middle) return;
+    if (current_bgm_stage == stage) return;
 
     mciSendStringA("stop library_bgm", NULL, 0, NULL);
     mciSendStringA("close library_bgm", NULL, 0, NULL);
-    filename = use_middle ? "middle.mp3" : "begin.mp3";
+    if (stage == BGM_ENDING) filename = "ending.mp3";
+    else if (stage == BGM_MIDDLE) filename = "middle.mp3";
+    else filename = "begin.mp3";
     snprintf(command, sizeof(command),
              "open \"%s\" type mpegvideo alias library_bgm", filename);
     mciSendStringA(command, NULL, 0, NULL);
     mciSendStringA("play library_bgm repeat", NULL, 0, NULL);
-    bgm_is_middle = use_middle;
+    current_bgm_stage = stage;
 }
 
 static void bgm_start(void) {
-    bgm_play_stage(0);
+    bgm_play_stage(BGM_BEGIN);
 }
 
 static void bgm_update_for_progress(int returned_books) {
-    bgm_play_stage(returned_books > 4);
+    if (returned_books >= 25) bgm_play_stage(BGM_ENDING);
+    else if (returned_books > 4) bgm_play_stage(BGM_MIDDLE);
+    else bgm_play_stage(BGM_BEGIN);
 }
 
 static void bgm_stop(void) {
     mciSendStringA("stop library_bgm", NULL, 0, NULL);
     mciSendStringA("close library_bgm", NULL, 0, NULL);
-    bgm_is_middle = -1;
+    current_bgm_stage = -1;
 }
 #else
 static void bgm_start(void) { }
