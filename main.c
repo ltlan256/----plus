@@ -138,7 +138,8 @@ static void ending_page(void) {
     } else {
         printf("[无法读取最终攻略画面：%s]\n", ENDING_ART_FILE);
     }
-    printf("\n恭喜你，可以跟流川枫一起打球了！\n");
+    printf("\n(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧ 恭喜你，已经攻略流川枫啦！\n");
+    printf("从今天起，就可以和他一起打球了～ ٩(ˊᗜˋ*)و ♡\n");
 }
 
 static void relationship_status(const User *user) {
