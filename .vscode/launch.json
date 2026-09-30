@@ -3,23 +3,14 @@
   "configurations": [
     {
       "name": "编译并运行图书馆程序",
-      "type": "cppdbg",
+      "type": "cppvsdbg",
       "request": "launch",
       "program": "${workspaceFolder}/library.exe",
       "args": [],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
       "externalConsole": true,
-      "MIMode": "gdb",
-      "miDebuggerPath": "C:/Users/ZXzh2/AppData/Local/Microsoft/WinGet/Packages/BrechtSanders.WinLibs.POSIX.UCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/mingw64/bin/gdb.exe",
-      "preLaunchTask": "编译图书馆程序",
-      "setupCommands": [
-        {
-          "description": "启用 GDB 美化显示",
-          "text": "-enable-pretty-printing",
-          "ignoreFailures": true
-        }
-      ]
+      "preLaunchTask": "编译图书馆程序"
     },
     {
       "name": "C/C++ Runner: Debug Session",
